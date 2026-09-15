@@ -10,13 +10,32 @@ const storage = multer.diskStorage({
     cb(null, path.resolve(__dirname, '../../storage'));
   },
   filename: (req, file, cb) => {
-    const sanitizedName = file.originalname.replace(/\s+/g, '-');
-    cb(null, `${Date.now()}-${randomUUID()}-${sanitizedName}`);
+    const extension = path.extname(file.originalname).toLowerCase();
+    cb(null, `${randomUUID()}${extension}`);
   },
 });
 
+const allowedMimeTypes = new Set([
+  'text/plain',
+  'text/csv',
+  'application/json',
+  'application/pdf',
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+]);
+
 const upload = multer({
   storage,
+  fileFilter: (req, file, cb) => {
+    if (!allowedMimeTypes.has(file.mimetype)) {
+      const error = new Error('Tipo de arquivo não permitido.');
+      error.statusCode = 400;
+      return cb(error);
+    }
+
+    return cb(null, true);
+  },
   limits: {
     fileSize: 10 * 1024 * 1024,
   },

@@ -1,10 +1,10 @@
 async function request(path, options = {}) {
   const response = await fetch(`/api${path}`, {
+    ...options,
     headers: {
       ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
       ...options.headers,
     },
-    ...options,
   });
 
   const contentType = response.headers.get('content-type') || '';
