@@ -1,5 +1,13 @@
 const documentRepository = require('../repositories/documentRepository');
 
+const toPublicDocument = (document) => ({
+  id: document.id,
+  originalName: document.originalName,
+  size: document.size,
+  uploadedAt: document.uploadedAt,
+  owner: document.owner,
+});
+
 const uploadDocument = async (file, owner) => {
   if (!file) {
     throw new Error('Arquivo obrigatório.');
@@ -13,25 +21,13 @@ const uploadDocument = async (file, owner) => {
     owner: owner || 'anonymous',
   });
 
-  return {
-    id: savedDocument.id,
-    originalName: savedDocument.originalName,
-    size: savedDocument.size,
-    uploadedAt: savedDocument.uploadedAt,
-    owner: savedDocument.owner,
-  };
+  return toPublicDocument(savedDocument);
 };
 
 const listDocuments = async () => {
   const documents = await documentRepository.listDocuments();
 
-  return documents.map((document) => ({
-    id: document.id,
-    originalName: document.originalName,
-    size: document.size,
-    uploadedAt: document.uploadedAt,
-    owner: document.owner,
-  }));
+  return documents.map(toPublicDocument);
 };
 
 const downloadDocument = async (documentId) => {
