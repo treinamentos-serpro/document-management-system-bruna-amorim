@@ -36,7 +36,7 @@ const createDocument = async ({ originalName, size, fileName, filePath, owner })
   return newDocument;
 };
 
-const listDocuments = async () => documents;
+const listDocuments = async () => documents.map((document) => ({ ...document }));
 
 const findDocumentById = async (documentId) => documents.find((document) => document.id === documentId);
 

@@ -5,13 +5,20 @@ import { fetchDocuments } from './services/documentApi';
 
 export default function App() {
   const [documents, setDocuments] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const loadDocuments = async () => {
+    setIsLoading(true);
+    setError('');
+
     try {
       const payload = await fetchDocuments();
       setDocuments(payload);
-    } catch (error) {
-      console.error(error);
+    } catch (loadError) {
+      setError(loadError.message || 'Não foi possível carregar os documentos.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -24,7 +31,14 @@ export default function App() {
       <h1>Document Management System</h1>
 
       <UploadComponent onUploadSuccess={loadDocuments} />
-      <DocumentList documents={documents} />
+      {isLoading ? <p>Carregando documentos...</p> : null}
+      {error ? (
+        <div role="alert">
+          <p>{error}</p>
+          <button type="button" onClick={loadDocuments}>Tentar novamente</button>
+        </div>
+      ) : null}
+      {!isLoading && !error ? <DocumentList documents={documents} /> : null}
     </main>
   );
 }

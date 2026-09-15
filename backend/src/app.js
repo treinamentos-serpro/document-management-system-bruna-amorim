@@ -23,6 +23,20 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
+app.use((error, req, res, next) => {
+  if (res.headersSent) {
+    return next(error);
+  }
+
+  if (error.code === 'LIMIT_FILE_SIZE') {
+    return res.status(413).json({ message: 'O arquivo excede o limite de 10 MB.' });
+  }
+
+  return res.status(error.statusCode || 500).json({
+    message: error.statusCode ? error.message : 'Erro interno do servidor.',
+  });
+});
+
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`DMS backend ouvindo na porta ${PORT}`);
